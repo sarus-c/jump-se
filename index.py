@@ -1,5 +1,6 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, json
+from werkzeug.exceptions import HTTPException
 from flask_restful import Api, Resource
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -11,6 +12,21 @@ load_dotenv()
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+
+
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors."""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    })
+    response.content_type = "application/json"
+    return response
 
 
 class Task(Resource):
@@ -25,8 +41,8 @@ class Task(Resource):
                 load = requests.post(os.getenv('API_ITEMS'), json=data.items)
                 if load.status_code in {200, 201}:
                     rs = 'Operation done!'
-            except ValueError:
-                rs = 'Error'
+            except HTTPException as e:
+                rs = handle_exception(e)
 
         return {'result': rs}
 
