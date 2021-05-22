@@ -1,0 +1,5 @@
+venv/
+Dockerfile
+.env
+__pycache__
+.idea
