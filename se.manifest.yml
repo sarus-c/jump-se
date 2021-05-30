@@ -1,7 +1,0 @@
-applications:
-- name: Jump-SE
-  routes:
-  - route: jumpse.cert.cfapps.eu10.hana.ondemand.com
-  docker:
-    image: santohi/jumpse:latest
-    username: santohi
